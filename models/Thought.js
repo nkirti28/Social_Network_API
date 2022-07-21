@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 // import moment module to format the timestamp
 const moment = require("moment");
 
@@ -66,3 +66,15 @@ const ThoughtSchema = new Schema(
     id: false,
   }
 );
+
+// get reactionsCount that retrieves from the Thought's reactions array length
+
+ThoughtSchema.virtual("reactionsCount").get(function () {
+  return this.reactions.length;
+});
+
+// create Thought model using ThoughtSchema
+
+const Thought = model("Thought", ThoughtSchema);
+
+module.exports = Thought;
