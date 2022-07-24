@@ -14,14 +14,19 @@ const ThoughtController = {
   },
 
   // get single thought
-  getSingleThought(req, res) {
-    Thought.findOne({ _id: req.params.thoughtId })
+  getSingleThought({ params }, res) {
+    Thought.findOne({ _id: params.id })
+      .populate({ path: "reactions", select: "-__v" })
       .select("-__v")
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: "No Thought find with this ID!" })
-          : res.json(thought)
-      )
+      .then((dbThoughtsData) => {
+        if (!dbThoughtsData) {
+          res
+            .status(404)
+            .json({ message: "No thoughts with this particular ID!" });
+          return;
+        }
+        res.json(dbThoughtsData);
+      })
       .catch((error) => {
         console.error(error);
         res.status(500).send(error.message);
@@ -44,6 +49,42 @@ const ThoughtController = {
           ? res.status(404).json({ message: "No User find with this ID!" })
           : res.json(dbThoughtData)
       )
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send(error.message);
+      });
+  },
+
+  //update a thought
+  updateThought(req, res) {
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $set: req.body },
+      { runValidators: true, New: true }
+    )
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: "No thought find with this ID!" })
+          : res.json(user)
+      )
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send(error.message);
+      });
+  },
+
+  // delete thought
+  deleteThought({ params }, res) {
+    Thought.findOneAndDelete({ _id: params.id })
+      .then((dbThoughtsData) => {
+        if (!dbThoughtsData) {
+          res
+            .status(404)
+            .json({ message: "No thoughts with this particular ID!" });
+          return;
+        }
+        res.json(dbThoughtsData);
+      })
       .catch((error) => {
         console.error(error);
         res.status(500).send(error.message);
