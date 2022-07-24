@@ -90,4 +90,50 @@ const ThoughtController = {
         res.status(500).send(error.message);
       });
   },
+
+  // Add a new Reaction
+  addReaction({ params, body }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $push: { reactions: body } },
+      { new: true, runValidators: true }
+    )
+      .populate({ path: "reactions", select: "-__v" })
+      .select("-__v")
+      .then((dbThoughtsData) => {
+        if (!dbThoughtsData) {
+          res
+            .status(404)
+            .json({ message: "No thoughts with this particular ID!" });
+          return;
+        }
+        res.json(dbThoughtsData);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send(error.message);
+      });
+  },
+
+  // Delete a reaction
+  deleteReaction({ params }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
+      { new: true }
+    )
+      .then((dbThoughtsData) => {
+        if (!dbThoughtsData) {
+          res
+            .status(404)
+            .json({ message: "No thoughts with this particular ID!" });
+          return;
+        }
+        res.json(dbThoughtsData);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send(error.message);
+      });
+  },
 };
