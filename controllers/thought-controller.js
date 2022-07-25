@@ -137,3 +137,5 @@ const ThoughtController = {
       });
   },
 };
+
+module.exports = ThoughtController;
