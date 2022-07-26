@@ -27,11 +27,8 @@ const ReactionSchema = new Schema(
   },
   {
     toJSON: {
-      virtuals: true,
       getters: true,
     },
-    //prevent virtuals from creating duplicate of '_id' as'id'
-    id: false,
   }
 );
 
